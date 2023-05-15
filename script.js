@@ -1,10 +1,17 @@
 class Trainer {
  
-    constructor(name,age,Pokemon,friends){
+    constructor(name,age,Pokemons,friends){
         this.name = name;
         this.age = age; 
-        this.Pokemon = Pokemon;
-        this.Friends =friends ;
+        this.Pokemon = [];
+        this.Friends = [] ;
+
+        if(Pokemons instanceof Pokemon){
+            this.Pokemon.push(Pokemons)
+        }
+        else if(Array.isArray(Pokemons)){
+            this.Pokemon = Pokemons
+        }
     }
 showFriends(){
     console.log("List of "+ this.name+ "'s" +" Friends")
@@ -24,22 +31,28 @@ showPokemons(){
 talk(n){
     console.log(this.Pokemon[n].getName() + " I choose you!")
 }
-command(attackerIndex , Pokemon){
-    this.Pokemon[attackerIndex].tackle(Pokemon)
+command(attackerIndex , defender){
+    this.Pokemon[attackerIndex].tackle(defender)
 }
 
-addPokemon(Pokemon){
-    this.Pokemon.push(Pokemon);
+addPokemon(Pokemons){
+    if(Pokemons instanceof Pokemon){
+        this.Pokemon.push(Pokemons);
+    }
+    else if(Array.isArray(Pokemons)){
+        this.Pokemon = this.Pokemon.concat(Pokemons)
+    }
 }
 }
 
 class Pokemon{
-    isDead = false
+    
     constructor(name,level,health,attackdmg){
         this.name = name
         this.level = level
         this.health = health
         this.attackdmg = attackdmg
+        this.isDead = false
     }
 
 tackle (Pokemon) {
@@ -60,7 +73,7 @@ tackle (Pokemon) {
             let tempLevel = this.getLevel()
             this.addLevel(1)
             console.log("Pokemon " + this.getName()  +" Leveled Up from " + tempLevel+ " to " +  this.getLevel() )
-            console.log("Attack dmg is increased by 5, from " + this.getAttackdmg() + this.addAttackDmg(5) )
+            console.log("Attack dmg is increased by 5, from " + this.getAttackdmg()+" to " + this.addAttackDmg(5) )
             Pokemon.isDead = true
        }
     }
@@ -94,10 +107,52 @@ faint(Pokemon){
     console.log(Pokemon.getName()+ " Fainted")
 }
 }
+function showMenu(){
+    console.log("Welcome To Pokemon Game \n1.Fight a Random Pokemon\n2.Show Friends\n3.Add Pokemon")
+}
 
-let pikachu = new Pokemon("pikachu",10,100,15);
-let grudon = new Pokemon("grudon",30,100,40);
-pokemonList = [pikachu,grudon];
-let ash = new Trainer("Ash",15,pokemonList,"brock");
-let rayquaza = new Pokemon("rayquaza",70,500,70);
-ash.command(1,rayquaza);
+function blockingDelay(ms) {
+    const start = new Date();
+    let now = new Date();
+    
+    while (now - start < ms) {
+      now = new Date();
+    }
+  }
+  
+const prompt = require("prompt-sync")()
+const fs = require ('fs');
+let listOfPokemons = []
+try {  
+    var data = fs.readFileSync('pokemons.txt', 'utf8');
+    const lines = data.trim().split("\n");
+    lines.forEach(line => {
+        const values = line.trim().split(' ');
+        const name = values[0];
+        const lvl = parseInt(values[1]);
+        const health = parseInt(values[2]);
+        const attackdmg = parseInt(values[3]);
+        listOfPokemons.push(new Pokemon(name,lvl,health,attackdmg));
+    }); 
+}catch(e) { 
+    // Printing error 
+    console.log('Error:', e.stack);
+}
+const ash = new Trainer("Ash",21,listOfPokemons[0],"Brock")
+while(true){
+    showMenu()
+    let choice = prompt('Enter Your Choice:')
+if(choice == 1 ){
+    let randomNumber = Math.floor(Math.random() * 37);
+    let randomPokemon = listOfPokemons[randomNumber]
+    let ashPokemon = ash.Pokemon[0]
+    while(!ashPokemon.isDead&&!randomPokemon.isDead){
+    blockingDelay(2000)
+    ashPokemon.tackle(randomPokemon)
+    blockingDelay(2000)
+    randomPokemon.tackle(ashPokemon)
+    blockingDelay(2000)
+    }
+  
+}
+} 
