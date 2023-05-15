@@ -1,4 +1,4 @@
-pikachu 15 200 40
+pikachu 15 150 40
 charizard 20 150 25
 blastoise 15 120 20
 venusaur 18 130 22

@@ -12,6 +12,12 @@ class Trainer {
         else if(Array.isArray(Pokemons)){
             this.Pokemon = Pokemons
         }
+        if(friends instanceof Trainer){
+            this.Friends.push(friends)
+        }
+        else if(Array.isArray(friends)){
+            this.Friends = friends
+        }
     }
 showFriends(){
     console.log("List of "+ this.name+ "'s" +" Friends")
@@ -19,13 +25,17 @@ showFriends(){
         console.log(this.Friends[i].name)
     }
 }
+getPokemon(){
+    return this.Pokemon
+}
 addFriend(name){
     this.Friends.push(name)
 }
 showPokemons(){
     console.log("List of "+ this.name+ "'s" +" Pokemons")
     for(let i = 0; i < this.Pokemon.length; i++){
-        console.log(this.Pokemon[i].name);
+        let j = i;
+        console.log(j+1+"."+this.Pokemon[i].name);
     }
 }
 talk(n){
@@ -64,9 +74,10 @@ tackle (Pokemon) {
             console.log(this.getName() + " is already dead ")
             return
         }
+        
         console.log(this.name + " attacks "+ Pokemon.name + " with "+ this.attackdmg  +" damage" )
-       let pokemonHealth =  Pokemon.getHealth() - this.getAttackdmg()
-       Pokemon.setHealth(pokemonHealth);
+       let pokemonHealth =  Pokemon.getHealth()
+       Pokemon.setHealth(pokemonHealth- this.getAttackdmg());
        console.log(Pokemon.name + " health is " + Pokemon.getHealth())
        if(Pokemon.getHealth() <= 0){
             this.faint(Pokemon)
@@ -108,7 +119,35 @@ faint(Pokemon){
 }
 }
 function showMenu(){
-    console.log("Welcome To Pokemon Game \n1.Fight a Random Pokemon\n2.Show Friends\n3.Add Pokemon")
+    console.log("------------------------------------------------")
+    console.log("Welcome To Pokemon Game \n1.Fight a Random Pokemon\n2.Show Friends\n3.Add Pokemon\n4.Show Pokemon\n5.Show Pokemon Stats\n6.Show Friends\n7.Exit")
+    console.log("------------------------------------------------")
+}
+function selectValidPokemonIndex(Trainer) {
+    let selectedPokemonIndex;
+    let isValid = false
+    let dead = false;
+    while (!isValid || dead) {
+      ash.showPokemons();
+      selectedPokemonIndex = prompt("Select Pokemon from the list (Enter Number): ");
+      // Check if the input is a valid number within the range
+      if (isNaN(selectedPokemonIndex) || selectValidPokemonIndex < 0||selectedPokemonIndex > Trainer.Pokemon.length) {
+        console.log("Invalid input. Please enter a valid number.");
+        selectedPokemonIndex = undefined; 
+      }
+      else {
+        selectedPokemonIndex -= 1; 
+        if(Trainer.Pokemon[selectedPokemonIndex].isDead){
+            console.log(Trainer.Pokemon[selectedPokemonIndex].getName()+" is dead. Please choose a different one.");
+            dead = true;
+        }
+        else {
+            isValid= true;
+        }
+    }
+}
+    return selectedPokemonIndex;
+  
 }
 
 function blockingDelay(ms) {
@@ -120,7 +159,7 @@ function blockingDelay(ms) {
     }
   }
   
-const prompt = require("prompt-sync")()
+const prompt = require("prompt-sync")({sigint:true})
 const fs = require ('fs');
 let listOfPokemons = []
 try {  
@@ -138,21 +177,48 @@ try {
     // Printing error 
     console.log('Error:', e.stack);
 }
-const ash = new Trainer("Ash",21,listOfPokemons[0],"Brock")
+const brock = new Trainer("Brock",20,listOfPokemons[2],"none")
+const pikachu = new Pokemon("Pikachu",20,150,35);
+const ash = new Trainer("Ash",21,pikachu,brock)
 while(true){
     showMenu()
-    let choice = prompt('Enter Your Choice:')
+    let choice = prompt('Enter Your Choice: ')
 if(choice == 1 ){
+    let selectedPokemonIndex = selectValidPokemonIndex(ash)
     let randomNumber = Math.floor(Math.random() * 37);
-    let randomPokemon = listOfPokemons[randomNumber]
-    let ashPokemon = ash.Pokemon[0]
+    let randomPokemon = listOfPokemons[randomNumber];
+    let ashPokemon = ash.Pokemon[selectedPokemonIndex];
+    ash.talk(selectedPokemonIndex)
+    
     while(!ashPokemon.isDead&&!randomPokemon.isDead){
-    blockingDelay(2000)
-    ashPokemon.tackle(randomPokemon)
-    blockingDelay(2000)
-    randomPokemon.tackle(ashPokemon)
-    blockingDelay(2000)
+    blockingDelay(2000);
+    ashPokemon.tackle(randomPokemon);
+    blockingDelay(2000);
+    randomPokemon.tackle(ashPokemon);
+    blockingDelay(2000);
     }
+}
+if(choice == 2){
+    ash.showFriends();
+}
+if (choice == 3){
+    const pokemonName = prompt("Enter Pokemon Name: ");
+    const lvl = prompt("Enter pokemon lvl: ");
+    ash.addPokemon(new Pokemon(pokemonName,parseInt(lvl),140,25));
+}
+if (choice == 4){
+    ash.showPokemons();
+}
+if (choice ==5 ){
+    console.log(ash.Pokemon)
+}
+if (choice == 6){
+    ash.showFriends()
+}
+if (choice == 7){
+    break;
+}
+
   
 }
-} 
+
