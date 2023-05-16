@@ -28,8 +28,8 @@ showFriends(){
 getPokemon(){
     return this.Pokemon
 }
-addFriend(name){
-    this.Friends.push(name)
+addFriend(Trainer){
+    this.Friends.push(Trainer)
 }
 showPokemons(){
     console.log("List of "+ this.name+ "'s" +" Pokemons")
@@ -120,7 +120,7 @@ faint(Pokemon){
 }
 function showMenu(){
     console.log("------------------------------------------------")
-    console.log("Welcome To Pokemon Game \n1.Fight a Random Pokemon\n2.Show Friends\n3.Add Pokemon\n4.Show Pokemon\n5.Show Pokemon Stats\n6.Show Friends\n7.Exit")
+    console.log("Welcome To Pokemon Game \n1.Fight a Random Pokemon\n2.Show Friends\n3.Add Pokemon\n4.Show Pokemon\n5.Show Pokemon Stats\n6.Show Friends\n7.Add Friend\n8.Exit")
     console.log("------------------------------------------------")
 }
 function selectValidPokemonIndex(Trainer) {
@@ -216,6 +216,14 @@ if (choice == 6){
     ash.showFriends()
 }
 if (choice == 7){
+    let name = prompt("Enter Friend Name ")
+    let age = prompt("Enter Friend Age ")
+    let randomNumber = Math.floor(Math.random() * 37);
+    let friend = new Trainer(name,age,listOfPokemons[randomNumber],"none")
+    ash.addFriend(friend);
+    console.log(friend.name + " is added to your list")
+}
+if (choice ==8){
     break;
 }
 
